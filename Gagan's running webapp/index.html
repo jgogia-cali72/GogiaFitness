@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gogia Fitness 🏃</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080c14;
+      --card: #111827;
+      --card2: #1f2937;
+      --green: #00e676;
+      --orange: #ff6d00;
+      --yellow: #ffd600;
+      --blue: #448aff;
+      --purple: #b388ff;
+      --text: #f9fafb;
+      --text2: #9ca3af;
+      --border: #374151;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── LOGIN ─── */
+    #login-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 32px 24px;
+      background: radial-gradient(ellipse at top, #0d1f3c 0%, var(--bg) 60%);
+    }
+
+    .logo-wrap { text-align: center; margin-bottom: 52px; }
+    .logo-icon { font-size: 3.5rem; display: block; margin-bottom: 12px; animation: bounce 2s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .logo-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #00e676 0%, #448aff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo-sub { color: var(--text2); font-size: 0.95rem; margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
+
+    .who-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text2);
+      margin-bottom: 20px;
+    }
+
+    .user-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .user-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .user-card:hover { transform: translateY(-6px) scale(1.02); }
+    .user-card.gagan-card { border-color: rgba(0,230,118,0.4); }
+    .user-card.gagan-card:hover { border-color: var(--green); box-shadow: 0 0 40px rgba(0,230,118,0.25); }
+    .user-card.arjun-card { border-color: rgba(68,138,255,0.4); }
+    .user-card.arjun-card:hover { border-color: var(--blue); box-shadow: 0 0 40px rgba(68,138,255,0.25); }
+
+    .user-avatar-big { font-size: 3.5rem; display: block; margin-bottom: 10px; }
+    .user-name { font-size: 1.3rem; font-weight: 900; }
+    .user-age { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+    .user-sports { font-size: 0.75rem; color: var(--text2); margin-top: 6px; }
+
+    /* ─── APP SHELL ─── */
+    #app { display: none; }
+    #app.visible { display: block; }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(8,12,20,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 900;
+    }
+    .header-avatar.gagan-av { background: rgba(0,230,118,0.15); border: 2px solid var(--green); }
+    .header-avatar.arjun-av { background: rgba(68,138,255,0.15); border: 2px solid var(--blue); }
+    .header-name { font-size: 1rem; font-weight: 800; }
+    .header-streak { font-size: 0.75rem; color: var(--orange); font-weight: 700; }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--text2); color: var(--text); }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(17,24,39,0.97);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 200;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .nav-item {
+      flex: 1;
+      padding: 10px 4px 8px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text2);
+      transition: all 0.2s;
+    }
+    .nav-item .ni { font-size: 1.3rem; display: block; }
+    .nav-item .nl { font-size: 0.6rem; font-weight: 700; display: block; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-item.active { color: var(--green); }
+    .nav-item.active-blue { color: var(--blue); }
+
+    /* ─── PAGE CONTENT ─── */
+    .page-content { padding: 20px; padding-bottom: 90px; }
+    .view { display: none; }
+    .view.active { display: block; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(55,65,81,0.5);
+    }
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text2);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── TODAY VIEW ─── */
+    .today-hero {
+      background: linear-gradient(135deg, #0d2137 0%, #0a1f0a 100%);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .today-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(0,230,118,0.15), transparent 70%);
+    }
+    .today-week-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--green);
+    }
+    .today-day-title { font-size: 1.9rem; font-weight: 900; margin-top: 4px; line-height: 1; }
+    .today-day-sub { color: var(--text2); font-size: 0.85rem; margin-top: 6px; }
+    .today-badges { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-green { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+    .badge-orange { background: rgba(255,109,0,0.15); color: var(--orange); border: 1px solid rgba(255,109,0,0.3); }
+    .badge-blue { background: rgba(68,138,255,0.15); color: var(--blue); border: 1px solid rgba(68,138,255,0.3); }
+    .badge-purple { background: rgba(179,136,255,0.15); color: var(--purple); border: 1px solid rgba(179,136,255,0.3); }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text2);
+      padding: 8px 0 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .exercise-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(55,65,81,0.4);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .exercise-item:last-child { border-bottom: none; }
+    .exercise-item:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
+
+    .ex-check {
+      width: 26px; height: 26px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+      font-size: 0.8rem;
+    }
+    .exercise-item.done .ex-check {
+      background: var(--green);
+      border-color: var(--green);
+      animation: pop 0.3s ease;
+    }
+    @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+
+    .ex-emoji { font-size: 1.3rem; flex-shrink: 0; padding-top: 2px; }
+    .ex-info { flex: 1; }
+    .ex-name { font-weight: 700; font-size: 0.93rem; }
+    .exercise-item.done .ex-name { text-decoration: line-through; color: var(--text2); }
+    .ex-detail { font-size: 0.78rem; color: var(--text2); margin-top: 2px; }
+    .ex-note { font-size: 0.73rem; color: #6b7280; margin-top: 4px; font-style: italic; }
+
+    .workout-complete-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      margin-top: 20px;
+    }
+    .workout-complete-btn:hover { transform: scale(1.02); }
+    .workout-complete-btn:active { transform: scale(0.98); }
+    .wcb-gagan { background: linear-gradient(135deg, #00e676, #00bfa5); color: #000; }
+    .wcb-arjun { background: linear-gradient(135deg, #448aff, #7c4dff); color: #fff; }
+    .workout-complete-btn.already-done {
+      background: var(--card2);
+      color: var(--green);
+      border: 2px solid var(--green);
+      cursor: default;
+    }
+    .workout-complete-btn.already-done:hover { transform: none; }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 6px;
+      background: var(--card2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .pf-green { background: linear-gradient(90deg, var(--green), #00bfa5); }
+    .pf-blue { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+    .pf-orange { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+    .progress-label { font-size: 0.72rem; color: var(--text2); display: flex; justify-content: space-between; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat-val { font-size: 1.6rem; font-weight: 900; line-height: 1; }
+    .stat-lbl { font-size: 0.65rem; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ─── PROGRAM VIEW ─── */
+    .week-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+    }
+    .week-tab {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+    .week-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+    .week-tab.done-week { border-color: rgba(0,230,118,0.4); color: rgba(0,230,118,0.7); }
+
+    .phase-banner {
+      background: linear-gradient(135deg, #1a1f2e, #0d1f14);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .phase-icon { font-size: 1.8rem; }
+    .phase-name { font-size: 1rem; font-weight: 800; }
+    .phase-desc { font-size: 0.78rem; color: var(--text2); margin-top: 2px; }
+
+    .day-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .day-cell {
+      aspect-ratio: 0.8;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 4px 2px;
+    }
+    .day-cell:hover { border-color: var(--green); transform: translateY(-2px); }
+    .day-cell.dc-today { border-color: var(--orange); box-shadow: 0 0 14px rgba(255,109,0,0.3); }
+    .day-cell.dc-done { background: rgba(0,230,118,0.1); border-color: rgba(0,230,118,0.5); }
+    .day-cell.dc-strength { }
+    .day-cell.dc-recovery { background: rgba(179,136,255,0.07); }
+    .dc-abbr { font-size: 0.5rem; font-weight: 700; text-transform: uppercase; color: var(--text2); letter-spacing: 0.5px; }
+    .dc-num { font-size: 0.85rem; font-weight: 800; }
+    .dc-type { font-size: 0.65rem; }
+    .dc-check { font-size: 0.7rem; color: var(--green); }
+
+    .week-detail-card {
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .wdc-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+    }
+    .wdc-left { display: flex; align-items: center; gap: 10px; }
+    .wdc-day { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; }
+    .wdc-name { font-size: 0.92rem; font-weight: 800; }
+    .wdc-arrow { color: var(--text2); font-size: 0.8rem; transition: transform 0.2s; }
+    .wdc-arrow.open { transform: rotate(180deg); }
+    .wdc-body { display: none; padding: 14px 16px; }
+    .wdc-body.open { display: block; }
+    .wdc-ex { font-size: 0.82rem; color: var(--text2); padding: 4px 0; display: flex; gap: 8px; }
+    .wdc-ex-name { color: var(--text); font-weight: 600; }
+    .wdc-mark-btn {
+      width: 100%; margin-top: 14px; padding: 12px;
+      border-radius: 12px; border: none; font-size: 0.88rem; font-weight: 800;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .wdc-mark-btn.mark-done { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.4); }
+    .wdc-mark-btn.mark-done:hover { background: rgba(0,230,118,0.25); }
+    .wdc-mark-btn.mark-undo { background: rgba(0,230,118,0.08); color: var(--text2); border: 1px solid var(--border); }
+    .wdc-mark-btn.mark-undo:hover { background: rgba(255,255,255,0.05); }
+
+    /* ─── NUTRITION VIEW ─── */
+    .meal-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      padding-bottom: 4px;
+    }
+    .meal-tab {
+      flex-shrink: 0;
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+    .meal-tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    .meal-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 3px solid var(--orange);
+      transition: all 0.2s;
+    }
+    .meal-card:hover { transform: translateX(3px); }
+    .meal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .meal-icon { font-size: 1.5rem; }
+    .meal-name { font-weight: 800; font-size: 0.95rem; }
+    .meal-desc { color: var(--text2); font-size: 0.82rem; line-height: 1.5; }
+    .meal-why {
+      background: rgba(255,109,0,0.08);
+      border: 1px solid rgba(255,109,0,0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      color: #ffa040;
+      margin-top: 10px;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .meal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .meal-tag {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.07);
+      color: var(--text2);
+    }
+
+    /* Hydration tip */
+    .hydration-tip {
+      background: linear-gradient(135deg, rgba(68,138,255,0.1), rgba(0,230,118,0.1));
+      border: 1px solid rgba(68,138,255,0.3);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    /* ─── VIDEOS VIEW ─── */
+    .vid-tabs {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px;
+    }
+    .vid-tab {
+      flex-shrink: 0; padding: 8px 14px; border-radius: 20px;
+      border: 1px solid var(--border); background: none; color: var(--text2);
+      cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .vid-tab:hover { border-color: var(--text2); color: var(--text); }
+    .vid-header-card {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .vid-header-icon { font-size: 2rem; flex-shrink: 0; }
+    .vid-header-title { font-size: 1rem; font-weight: 800; }
+    .vid-header-desc { font-size: 0.8rem; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+    .vid-card {
+      background: var(--card); border-radius: 16px; padding: 16px;
+      margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.06);
+    }
+    .vid-title { font-weight: 800; font-size: 0.93rem; margin-bottom: 8px; line-height: 1.4; }
+    .vid-why {
+      font-size: 0.78rem; color: var(--green);
+      background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 8px; padding: 7px 10px; margin-bottom: 12px;
+    }
+    .vid-thumb-wrap {
+      position: relative; border-radius: 12px; overflow: hidden;
+      cursor: pointer; display: block; text-decoration: none;
+    }
+    .vid-thumb-wrap img {
+      width: 100%; display: block; border-radius: 12px;
+      transition: transform 0.2s; aspect-ratio: 16/9; object-fit: cover;
+      background: #111;
+    }
+    .vid-thumb-wrap:hover img { transform: scale(1.02); }
+    .vid-play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(255,0,0,0.9);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; transition: transform 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .vid-thumb-wrap:hover .vid-play-btn { transform: translate(-50%, -50%) scale(1.1); }
+    .vid-open-label {
+      margin-top: 8px;
+      font-size: 0.75rem; color: var(--text2); text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+
+    /* ─── REWARDS VIEW ─── */
+    .rewards-hero {
+      background: linear-gradient(135deg, #1a1200, #1a0a00);
+      border: 2px solid rgba(255,214,0,0.4);
+      border-radius: 22px;
+      padding: 32px 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .rewards-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, rgba(255,214,0,0.08), transparent 60%);
+    }
+    .ebike-emoji { font-size: 5rem; display: block; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .reward-title { font-size: 1.5rem; font-weight: 900; margin-top: 12px; }
+    .reward-sub { color: var(--text2); font-size: 0.88rem; margin-top: 6px; line-height: 1.5; }
+    .reward-locked { font-size: 0.78rem; color: var(--yellow); font-weight: 700; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    .goal-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .goal-event { font-size: 1rem; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+    .time-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .tc-box {
+      background: var(--card2);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .tc-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 6px; }
+    .tc-time { font-size: 1.3rem; font-weight: 900; }
+    .tc-time.tbd { color: var(--border); font-size: 1rem; }
+    .tc-change { font-size: 0.72rem; margin-top: 4px; font-weight: 700; }
+    .tc-change.positive { color: var(--green); }
+    .tc-box.baseline { border: 1px solid rgba(255,109,0,0.4); }
+    .tc-box.week3 { border: 1px solid rgba(68,138,255,0.4); }
+    .tc-box.week6 { border: 1px solid rgba(0,230,118,0.4); }
+
+    .enter-time-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: none;
+      color: var(--text2);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .enter-time-btn:hover { border-color: var(--green); color: var(--green); }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid var(--border);
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 18px; }
+    .modal input {
+      width: 100%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    .modal input:focus { border-color: var(--green); }
+    .modal-label { font-size: 0.8rem; color: var(--text2); margin-bottom: 6px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-btn-cancel { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text2); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+    .modal-btn-save { flex: 2; padding: 12px; border-radius: 10px; border: none; background: var(--green); color: #000; font-size: 0.9rem; font-weight: 800; cursor: pointer; }
+
+    /* Workout done day overlay */
+    .done-overlay {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .done-big { font-size: 4rem; }
+    .done-title { font-size: 1.5rem; font-weight: 900; margin-top: 12px; }
+    .done-sub { color: var(--text2); margin-top: 8px; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--green);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* Responsive */
+    @media (min-width: 480px) {
+      .user-cards { max-width: 440px; }
+      .page-content { max-width: 540px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="logo-wrap">
+    <span class="logo-icon">⚡</span>
+    <div class="logo-title">Gogia Fitness</div>
+    <div class="logo-sub">6-Week Speed Program</div>
+  </div>
+  <div class="who-label">Who's training today?</div>
+  <div class="user-cards">
+    <div class="user-card gagan-card" onclick="login('gagan')">
+      <span class="user-avatar-big">🏃</span>
+      <div class="user-name">Gagan</div>
+      <div class="user-age">Age 12</div>
+      <div class="user-sports">⚾ 🎾 ⚽</div>
+    </div>
+    <div class="user-card arjun-card" onclick="login('arjun')">
+      <span class="user-avatar-big">🔥</span>
+      <div class="user-name">Arjun</div>
+      <div class="user-age">Age 10</div>
+      <div class="user-sports">⚾ ⚽</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════ -->
+<div id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-avatar" id="hdr-avatar"></div>
+      <div>
+        <div class="header-name" id="hdr-name"></div>
+        <div class="header-streak" id="hdr-streak"></div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Switch ↩</button>
+  </div>
+
+  <!-- Page content -->
+  <div class="page-content">
+
+    <!-- ── TODAY VIEW ── -->
+    <div class="view active" id="view-today">
+      <div id="today-content"></div>
+    </div>
+
+    <!-- ── PROGRAM VIEW ── -->
+    <div class="view" id="view-program">
+      <div id="program-content"></div>
+    </div>
+
+    <!-- ── NUTRITION VIEW ── -->
+    <div class="view" id="view-nutrition">
+      <div id="nutrition-content"></div>
+    </div>
+
+    <!-- ── VIDEOS VIEW ── -->
+    <div class="view" id="view-videos">
+      <div id="videos-content"></div>
+    </div>
+
+    <!-- ── REWARDS VIEW ── -->
+    <div class="view" id="view-rewards">
+      <div id="rewards-content"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav" id="bottom-nav"></div>
+</div>
+
+<!-- Time Entry Modal -->
+<div class="modal-overlay" id="time-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Enter Time</div>
+    <div class="modal-label" id="modal-label">Time (mm:ss or ss.00)</div>
+    <input type="text" id="modal-input" placeholder="e.g. 14.5 or 3:12" />
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn-save" onclick="saveTime()">Save ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+let currentView = 'today';
+let programWeek = 1; // which week is shown in program view
+let modalContext = null; // { user, event, checkpoint }
+let currentVideoCategory = 0;
+
+// ═══════════════════════════════════════════
+//  PROGRAM DATA
+// ═══════════════════════════════════════════
+const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAY_FULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+// Which days have strength training (0=Mon, 2=Wed, 4=Fri)
+const STRENGTH_DAYS = [0, 2, 4];
+
+const PHASES = {
+  1: { name: 'Foundation', icon: '🌱', weeks: '1-2', desc: 'Build habits, perfect your form, establish your base.' },
+  2: { name: 'Build',      icon: '🔧', weeks: '3-4', desc: 'More intensity, heavier loads, complex movements.' },
+  3: { name: 'Peak',       icon: '🚀', weeks: '5-6', desc: 'Maximum effort, explosive power — race pace!' },
+};
+
+// Exercise templates per phase and section
+const WARMUP = {
+  all: [
+    { emoji:'🦾', name:'Jumping Jacks', detail:'2 × 30 sec', note:'Full range, arms all the way up' },
+    { emoji:'🌀', name:'Arm Circles', detail:'1 × 30 sec each direction', note:'Loosen up those shoulders' },
+    { emoji:'🦵', name:'Leg Swings', detail:'1 × 10 each leg, forward & side', note:'Hold onto a wall for balance' },
+    { emoji:'🌀', name:'Hip Circles', detail:'1 × 10 each direction', note:'Feet shoulder-width apart' },
+    { emoji:'🔥', name:'High Knees March', detail:'1 × 20m', note:'Slow and controlled to start' },
+  ]
+};
+
+const RUNNING_DRILLS = {
+  1: [
+    { emoji:'🦵', name:'High Knees', detail:'3 × 20m', note:'Drive knees to hip height, pump arms hard' },
+    { emoji:'⏭️', name:'A-Skips', detail:'3 × 20m', note:'Skip + drive knee up — the foundation of running mechanics' },
+    { emoji:'🍑', name:'Butt Kicks', detail:'3 × 20m', note:'Keep your thighs vertical, heels touch glutes' },
+    { emoji:'⚡', name:'Acceleration Sprint', detail:'3 × 20m', note:'Start low, gradually rise, hit full speed at 20m' },
+  ],
+  2: [
+    { emoji:'🦵', name:'High Knees', detail:'3 × 30m', note:'Full speed — this is a drill, not a warm-up' },
+    { emoji:'⏭️', name:'B-Skips', detail:'3 × 20m', note:'A-skip + extend the knee forward — more advanced mechanics' },
+    { emoji:'💃', name:'Carioca', detail:'3 × 20m each direction', note:'Hips open, quick feet, arms relaxed' },
+    { emoji:'⚡', name:'Acceleration Sprint', detail:'4 × 20m', note:'Explode from a still position each time' },
+  ],
+  3: [
+    { emoji:'⏭️', name:'A-Skips', detail:'3 × 30m', note:'Race pace mechanics — make it look perfect' },
+    { emoji:'⏭️', name:'B-Skips', detail:'3 × 20m', note:'Max height and power on each rep' },
+    { emoji:'⚡', name:'Sprint Ladder', detail:'2× (10m → 20m → 30m → 40m)', note:'Rest 90 sec between rounds' },
+    { emoji:'🚀', name:'Flying Sprint', detail:'3 × 30m', note:'Build speed over 20m, then fly through the last 30m' },
+  ],
+};
+
+const PLYO_BY_DAY = {
+  1: {
+    0: [ // Monday
+      { emoji:'🦘', name:'Broad Jumps', detail:'3 × 5 reps', note:'Max distance each jump — stick the landing 2 sec' },
+    ],
+    1: [ // Tuesday
+      { emoji:'↔️', name:'Lateral Bounds', detail:'3 × 8 each side', note:'Bound side to side, single leg, stick each landing' },
+    ],
+    2: [ // Wednesday
+      { emoji:'⬆️', name:'Squat Jumps', detail:'3 × 8 reps', note:'Land soft, absorb the load, explode up immediately' },
+    ],
+    3: [ // Thursday
+      { emoji:'🦶', name:'Single-Leg Hops', detail:'3 × 8 each leg', note:'Straight forward — focus on balance and power' },
+    ],
+    4: [ // Friday
+      { emoji:'💥', name:'Tuck Jumps', detail:'3 × 8 reps', note:'Drive knees to chest at top, land soft' },
+    ],
+    5: [ // Saturday
+      { emoji:'🔀', name:'Lateral Shuffle + Sprint', detail:'3 × 20m + 10m sprint', note:'Shuffle sideways, plant, then explode into sprint' },
+      { emoji:'🏀', name:'Medicine Ball Chest Pass', detail:'3 × 8 reps', note:'Against a wall, explode from chest — fast release!' },
+    ],
+    6: [] // Sunday — yoga day
+  },
+  2: {
+    0: [
+      { emoji:'🦘', name:'Broad Jumps', detail:'4 × 5 reps', note:'Try to beat your Phase 1 distance' },
+    ],
+    1: [
+      { emoji:'↔️', name:'Lateral Bounds', detail:'4 × 8 each side', note:'Increase the width of each bound' },
+    ],
+    2: [
+      { emoji:'📦', name:'Box Step Jumps', detail:'3 × 6 each leg', note:'Step off, land on one foot, absorb and hold 2 sec' },
+    ],
+    3: [
+      { emoji:'🦶', name:'Single-Leg Bounds', detail:'3 × 8 each leg', note:'Push for more distance than Phase 1 hops' },
+    ],
+    4: [
+      { emoji:'💥', name:'Depth Drops', detail:'3 × 6 reps', note:'Step off box, absorb landing with soft knees, hold still' },
+    ],
+    5: [
+      { emoji:'🌀', name:'Med Ball Rotational Throw', detail:'3 × 8 each side', note:'Hips lead the rotation — like a baseball swing!' },
+      { emoji:'🛢️', name:'Tidal Tank Walk', detail:'3 × 30m', note:'Water shifts = unstable = your core works overtime' },
+    ],
+    6: []
+  },
+  3: {
+    0: [
+      { emoji:'🦘', name:'Broad Jumps', detail:'4 × 6 reps', note:'Each jump should be your personal best effort' },
+    ],
+    1: [
+      { emoji:'↔️', name:'Reactive Lateral Bounds', detail:'4 × 8 each side', note:'No pause between bounds — continuous reactive effort' },
+    ],
+    2: [
+      { emoji:'💥', name:'Depth Jump to Sprint', detail:'3 × 5 reps', note:'Land, absorb, immediately sprint 10m' },
+    ],
+    3: [
+      { emoji:'🦶', name:'Single-Leg Bounds', detail:'4 × 8 each leg', note:'Cover maximum ground with each bound' },
+    ],
+    4: [
+      { emoji:'⚡', name:'Explosive Start Drills', detail:'5 × 10m', note:'From different stances: 2-point, 3-point, falling start' },
+    ],
+    5: [
+      { emoji:'🌀', name:'Med Ball Rotational Throw', detail:'4 × 8 each side', note:'Maximum power — fastest rotation you can control' },
+      { emoji:'🛢️', name:'Tidal Tank Sprint', detail:'3 × 20m', note:'Sprint with the tank — it fights back on every step!' },
+    ],
+    6: []
+  }
+};
+
+const YOGA_COOLDOWN = {
+  regular: [
+    { emoji:'🧘', name:'Hip Flexor Stretch', detail:'45 sec each side', note:'Couch stretch works great — front foot on wall' },
+    { emoji:'🦵', name:'Hamstring Stretch', detail:'45 sec each leg', note:'Straight leg, reach toward your toes, breathe' },
+    { emoji:'🦶', name:'Quad Stretch', detail:'30 sec each leg', note:'Balance on one foot — tests your stability too' },
+    { emoji:'🙏', name:"Child's Pose", detail:'1 min', note:'Knees wide, arms extended, breathe deep into your back' },
+  ],
+  sunday: [
+    { emoji:'🌅', name:'Sun Salutation', detail:'3 rounds slowly', note:'Move with your breath — this is your recovery day' },
+    { emoji:'🐦', name:'Pigeon Pose', detail:'90 sec each side', note:'Key hip opener for all three of your sports' },
+    { emoji:'🌍', name:"World's Greatest Stretch", detail:'5 reps each side', note:'Lunge + rotation + reach — opens everything' },
+    { emoji:'🔄', name:'90/90 Hip Stretch', detail:'60 sec each side', note:'Excellent for your hip internal/external rotation' },
+    { emoji:'🔄', name:'Thoracic Rotation', detail:'10 reps each side', note:'Spine health — huge for baseball & tennis swings' },
+    { emoji:'🧘', name:'Hip Flexor Stretch', detail:'90 sec each side', note:'Deeper hold than regular days — you have time today' },
+    { emoji:'🦵', name:'Full Hamstring Flow', detail:'2 min', note:'Seated + standing — work both positions' },
+    { emoji:'🙏', name:"Child's Pose + Side Stretch", detail:'2 min total', note:'Finish here, breathe it all out, great job this week' },
+  ]
+};
+
+const STRENGTH_EXERCISES = {
+  1: [ // Phase 1 — Foundation, 2 sets
+    { emoji:'🏋️', name:'Goblet Squat', detail:'2 × 8 reps @ 15 lb', note:'Dumbbell at chest, sit into heels, knees track over toes' },
+    { emoji:'🔩', name:'DB Romanian Deadlift', detail:'2 × 8 reps @ 15 lb each hand', note:'Hinge at hips, slight knee bend, feel the hamstring stretch' },
+    { emoji:'🚣', name:'DB Bent-Over Row', detail:'2 × 10 reps @ 10 lb each', note:'Chest parallel to floor, drive elbows to hips' },
+    { emoji:'💪', name:'Push-Ups', detail:'2 × 10 reps', note:'Core tight, lower all the way down, full extension up' },
+    { emoji:'🎗️', name:'Band Lateral Walk', detail:'2 × 15 steps each direction', note:'Band around ankles, stay in squat position, step wide' },
+    { emoji:'🏀', name:'Medicine Ball Slam', detail:'2 × 8 reps', note:'Drive ball overhead, slam down with full body, catch it' },
+  ],
+  2: [ // Phase 2 — Build, 3 sets
+    { emoji:'🏋️', name:'Goblet Squat', detail:'3 × 10 reps @ 20 lb', note:'Go deeper this phase — full depth, heels stay down' },
+    { emoji:'🔩', name:'DB Romanian Deadlift', detail:'3 × 10 reps @ 20 lb each', note:'Slow on the way down (3 sec), explode up' },
+    { emoji:'🚣', name:'DB Bent-Over Row', detail:'3 × 12 reps @ 15 lb each', note:'Full range — arm extends fully at bottom' },
+    { emoji:'💪', name:'Push-Ups', detail:'3 × 12 reps', note:'Tempo: 2 sec down, pause at bottom, explode up' },
+    { emoji:'🧗', name:'Pull-Ups', detail:'2 × max reps', note:'Use the bar — if needed, do jumping pull-ups for now' },
+    { emoji:'🎗️', name:'Band Lateral Walk', detail:'3 × 15 steps each direction', note:'Heavier band if this feels easy' },
+    { emoji:'🌀', name:'Med Ball Rotational Throw', detail:'3 × 8 each side', note:'Against a wall — hips start the rotation, not your arms' },
+  ],
+  3: [ // Phase 3 — Peak, 3-4 sets
+    { emoji:'🏋️', name:'Goblet Squat', detail:'3 × 12 reps @ 25 lb', note:'Add a pause at the bottom for 2 sec — makes it harder!' },
+    { emoji:'🔩', name:'DB Romanian Deadlift', detail:'3 × 12 reps @ 25 lb each', note:'Control is everything — this is where you build real hamstrings' },
+    { emoji:'🚣', name:'DB Bent-Over Row', detail:'3 × 12 reps @ 20 lb each', note:'Squeeze your shoulder blade in at top of each rep' },
+    { emoji:'🏋️', name:'DB Shoulder Press', detail:'3 × 10 reps @ 10 lb each', note:'Sit-up straight or stand — full extension overhead' },
+    { emoji:'💪', name:'Push-Ups', detail:'3 × 15 reps', note:'If easy: elevate feet on chair for decline push-ups' },
+    { emoji:'🧗', name:'Pull-Ups', detail:'3 × max reps', note:'Each week should see you add 1-2 reps — track it!' },
+    { emoji:'🎗️', name:'Band Lateral Walk', detail:'3 × 20 steps each direction', note:'Heavier band, faster tempo this phase' },
+    { emoji:'🌀', name:'Med Ball Rotational Throw', detail:'4 × 8 each side', note:'Max velocity — fastest, hardest rotation you can do' },
+    { emoji:'🛢️', name:'Tidal Tank Farmer Carry', detail:'3 × 30m', note:'Walk fast and controlled — the water makes balance brutal' },
+  ]
+};
+
+// Build a single day object
+function buildDay(user, week, dayOfWeek) {
+  const phase = week <= 2 ? 1 : week <= 4 ? 2 : 3;
+  const isSunday = dayOfWeek === 6;
+  const isStrength = STRENGTH_DAYS.includes(dayOfWeek) && !isSunday;
+  const plyos = PLYO_BY_DAY[phase][dayOfWeek] || [];
+
+  let drills = isSunday ? [] : RUNNING_DRILLS[phase];
+  if (user === 'arjun') {
+    // Arjun gets shorter version
+    drills = drills.slice(0, 3);
+  }
+
+  // Arjun gets phase 1 strength
+  const strengthPhase = user === 'arjun' ? 1 : phase;
+  const strength = isStrength ? STRENGTH_EXERCISES[strengthPhase] : [];
+  // Arjun gets 2 sets always
+  const strengthAdjusted = user === 'arjun'
+    ? strength.map(e => ({ ...e, detail: e.detail.replace(/3 × |4 × /, '2 × ') }))
+    : strength;
+
+  const yoga = isSunday ? YOGA_COOLDOWN.sunday : YOGA_COOLDOWN.regular;
+
+  return {
+    week,
+    dayOfWeek,
+    phase,
+    isSunday,
+    isStrength,
+    sections: [
+      { id: 'warmup',   label: '🔥 Warmup', exercises: WARMUP.all },
+      ...(isSunday ? [] : [{ id: 'drills', label: '🏃 Running Drills', exercises: drills }]),
+      ...(plyos.length ? [{ id: 'plyo', label: '💥 Plyometrics', exercises: plyos }] : []),
+      ...(strengthAdjusted.length ? [{ id: 'strength', label: '🏋️ Strength Training', exercises: strengthAdjusted }] : []),
+      { id: 'yoga',    label: isSunday ? '🧘 Yoga & Full Recovery' : '🧘 Cool-Down & Flexibility', exercises: yoga },
+    ]
+  };
+}
+
+// ═══════════════════════════════════════════
+//  NUTRITION DATA
+// ═══════════════════════════════════════════
+const NUTRITION = {
+  breakfast: [
+    { icon:'🥣', name:'Power Oatmeal Bowl', desc:'Rolled oats with banana, a scoop of peanut butter, honey drizzle, and a handful of blueberries.', why:'Complex carbs give you sustained energy for morning workouts. Banana = fast fuel, PB = protein and healthy fats.', tags:['High Energy','Pre-Workout','5 min'], border:'#ff6d00' },
+    { icon:'🥚', name:'Scrambled Eggs + Toast + Fruit', desc:'3 eggs scrambled with cheese, 2 slices whole grain toast, orange or berries on the side.', why:'Complete protein from eggs rebuilds muscles. Whole grain toast gives lasting energy without a crash.', tags:['High Protein','Balanced','10 min'] },
+    { icon:'🥞', name:'Protein Pancakes', desc:'2 eggs + ½ banana mashed together, cook as 3 mini pancakes. Top with Greek yogurt and berries.', why:'Natural protein + carbs in one meal. Greek yogurt adds extra protein and probiotics for gut health.', tags:['High Protein','Quick','Kids Love It'] },
+    { icon:'🫙', name:'Greek Yogurt Parfait', desc:'Full-fat Greek yogurt layered with granola, honey, and mixed berries. Add chia seeds if you have them.', why:'Greek yogurt has 2× the protein of regular yogurt. The granola provides carbs for energy. Easy to prep night before!', tags:['High Protein','No Cook','Prep Ahead'] },
+    { icon:'🍌', name:'Peanut Butter Banana Wrap', desc:'Whole wheat tortilla, 2 tbsp peanut butter, sliced banana, drizzle of honey. Roll and go.', why:'Perfect busy-morning meal. Peanut butter + banana is a classic athlete combo for quick and lasting energy.', tags:['Quick','Portable','No Cook'] },
+    { icon:'🧇', name:'Whole Grain Waffles + Eggs', desc:'2 whole grain waffles (frozen is fine!), 2 fried eggs, fruit on the side, small glass of milk.', why:'Balanced carbs + protein combo keeps you full until lunch. Milk adds calcium for strong bones — key for young athletes.', tags:['Balanced','Easy','Kid Friendly'] },
+  ],
+  lunch: [
+    { icon:'🫔', name:'Turkey & Avocado Wrap', desc:'Whole wheat tortilla, 3–4 slices turkey, half an avocado mashed, romaine, tomato, a little mustard.', why:'Upgrade from the basic sandwich — avocado adds healthy fats for brain and joint health. Turkey = lean protein.', tags:['High Protein','School-Friendly','No Heat Needed'] },
+    { icon:'🍗', name:'Chicken Rice Bowl', desc:'Leftover grilled chicken over white or brown rice, steamed broccoli or peas, drizzle of olive oil and soy sauce.', why:'The athlete triple threat: protein, carbs, and vegetables. Great for a post-workout lunch.', tags:['High Protein','Carb Load','Leftover Friendly'] },
+    { icon:'🥗', name:'Power Pasta Salad', desc:'Rotini pasta, canned tuna or chicken, cherry tomatoes, cucumber, olives, Italian dressing. Eat cold.', why:'Pasta salad is an underrated athlete lunch — complex carbs + protein, and it travels perfectly in a container.', tags:['School-Friendly','Prep Ahead','Carb Load'] },
+    { icon:'🌮', name:'Mini Chicken Tacos', desc:'3 small tortillas, seasoned chicken strips (grilled or from rotisserie), shredded cheese, salsa, Greek yogurt instead of sour cream.', why:'Fun to eat, easy to pack, and loaded with protein. Swapping sour cream for Greek yogurt adds extra protein.', tags:['High Protein','Kids Love It','Quick'] },
+    { icon:'🥪', name:'Upgraded Turkey Sandwich', desc:'Whole grain bread, turkey, sharp cheddar, avocado, lettuce, tomato, hummus instead of mayo.', why:'The classic gets a power boost — hummus adds fiber and protein. Whole grain bread fuels longer than white bread.', tags:['School-Friendly','Easy','No Heat'] },
+    { icon:'🥙', name:'Hummus & Chicken Pita', desc:'Whole wheat pita, hummus spread, sliced grilled chicken, cucumber, tomato, feta cheese.', why:'Mediterranean-style meals are elite athlete fuel — anti-inflammatory, balanced, and delicious.', tags:['High Protein','School-Friendly','Anti-Inflammatory'] },
+    { icon:'🍱', name:'Bento Box', desc:'Hard boiled eggs (2), cheese cubes, whole grain crackers, grapes, baby carrots, a small piece of dark chocolate.', why:'No cooking needed. Balanced across all food groups. The dark chocolate provides iron and antioxidants — a real bonus!', tags:['No Cook','School-Friendly','Quick Prep'] },
+    { icon:'🍝', name:'Leftover Pasta + Protein', desc:"Last night's pasta with any leftover chicken or ground beef, reheated in a thermos to keep warm.", why:"The easiest power lunch. Carbs from pasta + protein from meat = perfect pre-afternoon practice fuel. Don't waste good leftovers!", tags:['Leftover Friendly','High Energy','Thermos Required'] },
+  ],
+  dinner: [
+    { icon:'🍗', name:'Grilled Chicken Thighs + Rice + Veggie', desc:'Season chicken thighs with garlic, paprika, salt. Grill or bake. Serve with white rice and roasted broccoli.', why:'Chicken thighs have more healthy fat than breasts — better recovery for hard training days. Simple and delicious.', tags:['High Protein','Recovery Meal','Family Friendly'] },
+    { icon:'🐟', name:'Salmon + Sweet Potato + Green Beans', desc:'Baked salmon fillet, baked sweet potato, steamed green beans with butter and garlic salt.', why:'Salmon is the ultimate recovery food — omega-3 fats reduce inflammation from training. Sweet potato = great carbs.', tags:['Anti-Inflammatory','Recovery Meal','High Protein'] },
+    { icon:'🥩', name:'Ground Turkey Taco Bowl', desc:'Seasoned ground turkey, white rice, black beans, corn, shredded cheese, salsa, Greek yogurt on top.', why:'Complete meal in one bowl. Ground turkey is lean and high in zinc which supports muscle growth and immune health.', tags:['High Protein','Balanced','Family Favorite'] },
+    { icon:'🍝', name:'Spaghetti + Meat Sauce', desc:'Whole wheat spaghetti with ground beef or turkey meat sauce. Side salad. Glass of milk.', why:"The classic night-before-a-game meal for a reason. Loads of carbs for energy storage, protein for muscles. Don't skip this one!", tags:['Carb Load','Pre-Game Dinner','Family Favorite'] },
+    { icon:'🌯', name:'Chicken Burrito Night', desc:'Large flour tortilla, seasoned chicken, rice, black beans, cheese, guacamole, salsa.', why:'High volume, high protein, high carb. Perfect after a heavy training day. Guacamole adds healthy fats.', tags:['High Protein','Carb Load','Kids Love It'] },
+    { icon:'🍳', name:'Egg Fried Rice', desc:'Day-old rice fried with eggs, peas, carrots, soy sauce, sesame oil. Add chicken strips if you have them.', why:"Uses leftover rice (actually works better!), quick to make, balanced across all groups. A smart athlete's meal.", tags:['Quick','Balanced','Leftover Friendly'] },
+    { icon:'🥘', name:'Sheet Pan Chicken + Potatoes + Vegetables', desc:'Chicken pieces + cubed potatoes + bell peppers + zucchini, all on one pan with olive oil and Italian seasoning. 425°F, 35 min.', why:'Minimal prep, one pan to wash, loaded with nutrients. Potatoes are an underrated performance carb — better than you think!', tags:['Easy Cook','Family Friendly','Balanced'] },
+  ],
+  snacks: [
+    { icon:'🍫', name:'Chocolate Milk', desc:'8–12 oz cold chocolate milk post-workout.', why:"The research on this is real — chocolate milk's carb + protein ratio is almost identical to sports recovery drinks, and it's way tastier.", tags:['Post-Workout','Recovery','No Prep'] },
+    { icon:'🧀', name:'String Cheese + Apple', desc:'2 string cheese sticks + 1 apple.', why:'Protein + natural sugar + fiber. Perfect between meals or after school before practice.', tags:['Quick','Portable','Balanced'] },
+    { icon:'🥜', name:'Trail Mix', desc:'Almonds, cashews, pumpkin seeds, dried cranberries, dark chocolate chips.', why:'Healthy fats + protein + quick sugar from dried fruit. Excellent sustained energy snack. Make a big batch Sunday.', tags:['Prep Ahead','Portable','High Energy'] },
+    { icon:'🫙', name:'Greek Yogurt + Honey', desc:'Full-fat Greek yogurt, drizzle of honey, optional: granola or berries.', why:'High in protein and probiotics. Honey gives a quick energy boost. Great pre-workout snack 45–60 min before training.', tags:['High Protein','Pre-Workout','Quick'] },
+    { icon:'🍌', name:'Banana + Peanut Butter', desc:'1 banana with 2 tbsp peanut butter for dipping.', why:"The classic athlete snack. Banana's potassium prevents cramps. PB's healthy fat slows digestion for steady energy.", tags:['Pre-Workout','Quick','No Prep'] },
+    { icon:'🍎', name:'Apple + Almond Butter', desc:'Sliced apple with almond butter for dipping.', why:'Almond butter has slightly more vitamin E than peanut butter — great for muscle recovery. The combo is delicious.', tags:['Quick','Anti-Inflammatory','Portable'] },
+    { icon:'🥚', name:'Hard-Boiled Eggs', desc:'2 hard-boiled eggs, sprinkle of salt.', why:'Most portable protein there is. Prep a batch of 6 on Sunday and use them all week. 6g of protein per egg.', tags:['High Protein','Prep Ahead','Portable'] },
+    { icon:'🍫', name:'Protein Bar', desc:'Look for bars with 10g+ protein, under 20g sugar. Good brands: RXBar, Clif Kids, Kind bars.', why:"Great emergency snack for busy days. Not as good as real food but way better than skipping. Keep one in your bag.", tags:['Portable','On-the-Go','Easy'] },
+    { icon:'🍿', name:'Air-Popped Popcorn', desc:'3 cups air-popped or light microwave popcorn with a pinch of sea salt.', why:"Whole grain, high fiber, low calorie — a great evening snack that won't weigh you down before bed.", tags:['Light','Evening Snack','Quick'] },
+    { icon:'🥛', name:'Smoothie', desc:'1 banana + 1 cup frozen berries + 1 cup milk + 1 tbsp peanut butter + ice. Blend.', why:'Packed with everything: protein, carbs, antioxidants, potassium. Great pre-workout or post-workout drink.', tags:['Pre-Workout','Post-Workout','Blender Required'] },
+  ]
+};
+
+// ═══════════════════════════════════════════
+//  STORAGE HELPERS
+// ═══════════════════════════════════════════
+function storageKey(user, key) { return `gogia_${user}_${key}`; }
+
+function getSavedData(user, key, def) {
+  try {
+    const v = localStorage.getItem(storageKey(user, key));
+    return v !== null ? JSON.parse(v) : def;
+  } catch(e) { return def; }
+}
+
+function saveData(user, key, val) {
+  try { localStorage.setItem(storageKey(user, key), JSON.stringify(val)); } catch(e) {}
+}
+
+function getDoneSet(user) {
+  return getSavedData(user, 'done_workouts', {});
+}
+
+function markWorkoutDone(user, week, dayOfWeek) {
+  const done = getDoneSet(user);
+  done[`${week}_${dayOfWeek}`] = true;
+  saveData(user, 'done_workouts', done);
+}
+
+function isWorkoutDone(user, week, dayOfWeek) {
+  return !!getDoneSet(user)[`${week}_${dayOfWeek}`];
+}
+
+function getCompletedCount(user) {
+  return Object.keys(getDoneSet(user)).length;
+}
+
+function getStreak(user) {
+  return getSavedData(user, 'streak', 0);
+}
+
+function getTimes(user) {
+  return getSavedData(user, 'times', {
+    baseline_100m: null, w3_100m: null, w6_100m: null,
+    baseline_800m: null, w3_800m: null, w6_800m: null,
+  });
+}
+
+function saveTimes(user, times) {
+  saveData(user, 'times', times);
+}
+
+// Ex completions within today's workout
+function getDayExDone(user, week, dayOfWeek) {
+  return getSavedData(user, `ex_${week}_${dayOfWeek}`, {});
+}
+function saveExDone(user, week, dayOfWeek, data) {
+  saveData(user, `ex_${week}_${dayOfWeek}`, data);
+}
+
+// ═══════════════════════════════════════════
+//  CURRENT DATE → WEEK + DAY
+// ═══════════════════════════════════════════
+function getProgramStartDate(user) {
+  let stored = getSavedData(user, 'start_date', null);
+  if (!stored) {
+    // default to today
+    stored = new Date().toISOString().slice(0, 10);
+    saveData(user, 'start_date', stored);
+  }
+  return new Date(stored + 'T00:00:00');
+}
+
+function getCurrentWeekAndDay(user) {
+  const start = getProgramStartDate(user);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffMs = today - start;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays < 0) return { week: 1, dayOfWeek: 0 };
+  const week = Math.min(Math.floor(diffDays / 7) + 1, 6);
+  const dayOfWeek = diffDays % 7;
+  return { week, dayOfWeek };
+}
+
+// ═══════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ═══════════════════════════════════════════
+const USERS = {
+  gagan: { name: 'Gagan', avatar: '🏃', color: 'gagan', age: 12, sports: 'Baseball • Tennis • Soccer' },
+  arjun: { name: 'Arjun', avatar: '🔥', color: 'arjun', age: 10, sports: 'Baseball • Soccer' },
+};
+
+function login(user) {
+  currentUser = user;
+  const u = USERS[user];
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+
+  // Header
+  const av = document.getElementById('hdr-avatar');
+  av.textContent = u.avatar;
+  av.className = `header-avatar ${user}-av`;
+  document.getElementById('hdr-name').textContent = `${u.name}'s Workout`;
+  const streak = getStreak(user);
+  document.getElementById('hdr-streak').textContent = streak > 0 ? `🔥 ${streak} day streak` : u.sports;
+
+  // Build nav
+  buildNav(user);
+
+  // Show today
+  switchView('today');
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════
+function buildNav(user) {
+  const nav = document.getElementById('bottom-nav');
+  const items = [
+    { id: 'today',     icon: '⚡', label: "Today" },
+    { id: 'program',   icon: '📅', label: 'Program' },
+    { id: 'nutrition', icon: '🥗', label: 'Nutrition' },
+    { id: 'videos',    icon: '📱', label: 'Videos' },
+    ...(user === 'gagan' ? [{ id: 'rewards', icon: '🚴', label: 'Rewards' }] : []),
+  ];
+  nav.innerHTML = items.map(i => `
+    <button class="nav-item ${i.id === currentView ? 'active' : ''}" onclick="switchView('${i.id}')" data-view="${i.id}">
+      <span class="ni">${i.icon}</span>
+      <span class="nl">${i.label}</span>
+    </button>
+  `).join('');
+}
+
+function switchView(viewId) {
+  currentView = viewId;
+  // Hide all views
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById(`view-${viewId}`);
+  if (target) target.classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.view === viewId);
+  });
+
+  // Render content
+  if (viewId === 'today')     renderToday();
+  if (viewId === 'program')   renderProgram();
+  if (viewId === 'nutrition') renderNutrition();
+  if (viewId === 'videos')    renderVideos();
+  if (viewId === 'rewards')   renderRewards();
+}
+
+// ═══════════════════════════════════════════
+//  TODAY VIEW
+// ═══════════════════════════════════════════
+function renderToday() {
+  const user = currentUser;
+  const { week, dayOfWeek } = getCurrentWeekAndDay(user);
+  const day = buildDay(user, week, dayOfWeek);
+  const phase = PHASES[day.phase];
+  const done = isWorkoutDone(user, week, dayOfWeek);
+  const completed = getCompletedCount(user);
+  const total = 42;
+
+  const isGagan = user === 'gagan';
+  const accentColor = isGagan ? 'var(--green)' : 'var(--blue)';
+  const exDone = getDayExDone(user, week, dayOfWeek);
+
+  let typeLabel = day.isSunday ? 'Recovery Day' : day.isStrength ? 'Movement + Strength' : 'Movement Day';
+  let typeBadge = day.isSunday
+    ? `<span class="badge badge-purple">🧘 Recovery</span>`
+    : day.isStrength
+      ? `<span class="badge badge-orange">🏋️ Strength Day</span><span class="badge badge-green">🏃 Speed Work</span>`
+      : `<span class="badge badge-green">🏃 Speed Work</span><span class="badge badge-blue">💥 Plyos</span>`;
+
+  const heroTitle = day.isSunday ? 'Rest & Recover 🧘' : `Day ${(week-1)*7 + dayOfWeek + 1} — Let's Go!`;
+
+  let sectionsHtml = '';
+  day.sections.forEach(section => {
+    const exHtml = section.exercises.map((ex, i) => {
+      const exKey = `${section.id}_${i}`;
+      const isDone = exDone[exKey];
+      return `
+        <div class="exercise-item ${isDone ? 'done' : ''}" onclick="toggleEx('${section.id}', ${i})">
+          <div class="ex-check">${isDone ? '✓' : ''}</div>
+          <div class="ex-emoji">${ex.emoji}</div>
+          <div class="ex-info">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-detail">${ex.detail}</div>
+            ${ex.note ? `<div class="ex-note">${ex.note}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    sectionsHtml += `
+      <div class="card" style="margin-bottom:14px;">
+        <div class="section-label">${section.label}</div>
+        ${exHtml}
+      </div>
+    `;
+  });
+
+  const completeBtn = done
+    ? `<button class="workout-complete-btn already-done">✅ Workout Complete — Crushing It!</button>`
+    : `<button class="workout-complete-btn ${isGagan ? 'wcb-gagan' : 'wcb-arjun'}" onclick="completeWorkout()">
+        Mark Today's Workout Done 🔥
+       </button>`;
+
+  // Count total exercises done today
+  const totalEx = day.sections.reduce((a, s) => a + s.exercises.length, 0);
+  const doneEx = Object.keys(exDone).length;
+  const pct = totalEx ? Math.round((doneEx / totalEx) * 100) : 0;
+
+  document.getElementById('today-content').innerHTML = `
+    <div class="today-hero">
+      <div class="today-week-label">${phase.icon} Week ${week} • ${phase.name} Phase</div>
+      <div class="today-day-title">${DAY_FULL[dayOfWeek]}</div>
+      <div class="today-day-sub">${typeLabel}</div>
+      <div class="today-badges">${typeBadge}</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" style="color:${accentColor}">${completed}</div>
+        <div class="stat-lbl">Workouts Done</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${total - completed}</div>
+        <div class="stat-lbl">Left in Program</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--orange)">${Math.round((completed/total)*100)}%</div>
+        <div class="stat-lbl">Complete</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">📊 Today's Progress</div>
+      <div class="progress-bar">
+        <div class="progress-fill ${isGagan ? 'pf-green' : 'pf-blue'}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-label"><span>${doneEx} / ${totalEx} exercises</span><span>${pct}%</span></div>
+    </div>
+
+    ${sectionsHtml}
+    ${completeBtn}
+  `;
+}
+
+function toggleEx(sectionId, idx) {
+  const user = currentUser;
+  const { week, dayOfWeek } = getCurrentWeekAndDay(user);
+  const exDone = getDayExDone(user, week, dayOfWeek);
+  const key = `${sectionId}_${idx}`;
+  if (exDone[key]) {
+    delete exDone[key];
+  } else {
+    exDone[key] = true;
+  }
+  saveExDone(user, week, dayOfWeek, exDone);
+  renderToday();
+}
+
+function completeWorkout() {
+  const user = currentUser;
+  const { week, dayOfWeek } = getCurrentWeekAndDay(user);
+  markWorkoutDone(user, week, dayOfWeek);
+
+  // Update streak
+  const streak = getStreak(user);
+  saveData(user, 'streak', streak + 1);
+  document.getElementById('hdr-streak').textContent = `🔥 ${streak + 1} day streak`;
+
+  showToast('🔥 Workout complete! You crushed it!');
+  renderToday();
+}
+
+// ═══════════════════════════════════════════
+//  PROGRAM VIEW
+// ═══════════════════════════════════════════
+function renderProgram() {
+  const user = currentUser;
+  const { week: curWeek, dayOfWeek: curDay } = getCurrentWeekAndDay(user);
+  const isGagan = user === 'gagan';
+
+  // Week tabs
+  const tabsHtml = [1,2,3,4,5,6].map(w => {
+    const allDone = [0,1,2,3,4,5,6].every(d => isWorkoutDone(user, w, d));
+    return `<button class="week-tab ${w === programWeek ? 'active' : ''} ${allDone ? 'done-week' : ''}"
+      onclick="selectProgramWeek(${w})">
+      ${allDone ? '✅ ' : ''}Week ${w}
+    </button>`;
+  }).join('');
+
+  const phase = programWeek <= 2 ? 1 : programWeek <= 4 ? 2 : 3;
+  const p = PHASES[phase];
+
+  // Day grid
+  const gridHtml = DAY_NAMES.map((abbr, d) => {
+    const isDone = isWorkoutDone(user, programWeek, d);
+    const isToday = programWeek === curWeek && d === curDay;
+    const isSun = d === 6;
+    const isStr = STRENGTH_DAYS.includes(d);
+    const typeIcon = isSun ? '🧘' : isStr ? '💪' : '🏃';
+    return `
+      <div class="day-cell ${isDone ? 'dc-done' : ''} ${isToday ? 'dc-today' : ''} ${isSun ? 'dc-recovery' : ''}"
+           onclick="jumpToDay(${programWeek}, ${d})">
+        <span class="dc-abbr">${abbr}</span>
+        <span class="dc-num">${typeIcon}</span>
+        ${isDone ? '<span class="dc-check">✓</span>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  // Day detail accordions
+  const dayDetailsHtml = DAY_NAMES.map((abbr, d) => {
+    const day = buildDay(user, programWeek, d);
+    const isDone = isWorkoutDone(user, programWeek, d);
+    const isToday = programWeek === curWeek && d === curDay;
+    const isSun = d === 6;
+    const typeLabel = isSun ? 'Yoga & Recovery' : STRENGTH_DAYS.includes(d) ? 'Movement + Strength' : 'Movement Day';
+
+    const exList = day.sections.map(s =>
+      s.exercises.map(e => `<div class="wdc-ex"><span>${e.emoji}</span><span class="wdc-ex-name">${e.name}</span><span>${e.detail}</span></div>`).join('')
+    ).join('');
+
+    const markBtn = isDone
+      ? `<button class="wdc-mark-btn mark-undo" onclick="toggleDayDone(${programWeek}, ${d})">✓ Done — tap to undo</button>`
+      : `<button class="wdc-mark-btn mark-done" onclick="toggleDayDone(${programWeek}, ${d})">＋ Mark as Done</button>`;
+
+    return `
+      <div class="week-detail-card" id="day-card-${d}">
+        <div class="wdc-header" onclick="toggleDayDetail(this)">
+          <div class="wdc-left">
+            <div>
+              <div class="wdc-day">${DAY_FULL[d]} ${isToday ? '← TODAY' : ''} ${isDone ? '✅' : ''}</div>
+              <div class="wdc-name">${typeLabel}</div>
+            </div>
+          </div>
+          <span class="wdc-arrow">▼</span>
+        </div>
+        <div class="wdc-body">
+          ${exList}
+          ${markBtn}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Overall progress bar
+  const totalDone = getCompletedCount(user);
+  const pct = Math.round((totalDone / 42) * 100);
+
+  document.getElementById('program-content').innerHTML = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">📊 6-Week Program Progress</div>
+      <div class="progress-bar" style="height:10px;">
+        <div class="progress-fill ${isGagan ? 'pf-green' : 'pf-blue'}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-label" style="margin-top:8px;"><span>${totalDone} / 42 workouts done</span><span>${pct}%</span></div>
+    </div>
+
+    <div class="week-tabs">${tabsHtml}</div>
+
+    <div class="phase-banner">
+      <div class="phase-icon">${p.icon}</div>
+      <div>
+        <div class="phase-name">Phase ${phase}: ${p.name} (Weeks ${p.weeks})</div>
+        <div class="phase-desc">${p.desc}</div>
+      </div>
+    </div>
+
+    <div class="day-grid">${gridHtml}</div>
+    ${dayDetailsHtml}
+  `;
+}
+
+function selectProgramWeek(w) {
+  programWeek = w;
+  renderProgram();
+}
+
+function toggleDayDone(week, dayOfWeek) {
+  const user = currentUser;
+  const done = getDoneSet(user);
+  const key = `${week}_${dayOfWeek}`;
+  if (done[key]) {
+    delete done[key];
+    showToast('Workout unmarked');
+  } else {
+    done[key] = true;
+    showToast('✅ Workout marked as done!');
+  }
+  saveData(user, 'done_workouts', done);
+  renderProgram();
+}
+
+function jumpToDay(week, dayOfWeek) {
+  programWeek = week;
+  renderProgram();
+  // Open that day's accordion after render
+  setTimeout(() => {
+    const card = document.getElementById(`day-card-${dayOfWeek}`);
+    if (!card) return;
+    const header = card.querySelector('.wdc-header');
+    const body = card.querySelector('.wdc-body');
+    const arrow = card.querySelector('.wdc-arrow');
+    if (body && !body.classList.contains('open')) {
+      body.classList.add('open');
+      if (arrow) arrow.classList.add('open');
+    }
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+function toggleDayDetail(header) {
+  const arrow = header.querySelector('.wdc-arrow');
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.toggle('open');
+  arrow.classList.toggle('open', isOpen);
+}
+
+function jumpToDay(week, day) {
+  // Just scroll to top of program for now and highlight
+}
+
+// ═══════════════════════════════════════════
+//  NUTRITION VIEW
+// ═══════════════════════════════════════════
+let currentMealTab = 'breakfast';
+
+function renderNutrition() {
+  const tabs = [
+    { id: 'breakfast', label: '🌅 Breakfast' },
+    { id: 'lunch',     label: '🍱 Lunch' },
+    { id: 'dinner',    label: '🍽️ Dinner' },
+    { id: 'snacks',    label: '🍎 Snacks' },
+  ];
+
+  const tabsHtml = tabs.map(t => `
+    <button class="meal-tab ${t.id === currentMealTab ? 'active' : ''}"
+      onclick="switchMealTab('${t.id}')">${t.label}</button>
+  `).join('');
+
+  const meals = NUTRITION[currentMealTab] || [];
+  const mealsHtml = meals.map(m => `
+    <div class="meal-card">
+      <div class="meal-header">
+        <span class="meal-icon">${m.icon}</span>
+        <div class="meal-name">${m.name}</div>
+      </div>
+      <div class="meal-desc">${m.desc}</div>
+      <div class="meal-why">⚡ ${m.why}</div>
+      <div class="meal-tags">${(m.tags||[]).map(t => `<span class="meal-tag">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('nutrition-content').innerHTML = `
+    <div class="hydration-tip">
+      <span style="font-size:1.5rem">💧</span>
+      <div>
+        <div style="font-weight:800;font-size:0.9rem;margin-bottom:4px">Hydration Goal</div>
+        <div style="font-size:0.8rem;color:var(--text2)">
+          Gagan: drink at least <strong style="color:var(--blue)">8–10 cups</strong> of water per day.
+          Arjun: aim for <strong style="color:var(--blue)">6–8 cups</strong>.
+          Add one extra glass on training days. 🏃
+        </div>
+      </div>
+    </div>
+    <div class="meal-tabs">${tabsHtml}</div>
+    ${mealsHtml}
+  `;
+}
+
+function switchMealTab(tab) {
+  currentMealTab = tab;
+  renderNutrition();
+}
+
+// ═══════════════════════════════════════════
+//  VIDEOS VIEW
+// ═══════════════════════════════════════════
+const VIDEO_CATS = [
+  {
+    icon: '🏃', label: 'Speed Drills', color: '#00e676',
+    desc: 'Running mechanics that make you faster in every sport. Watch these before your drill days.',
+    videos: [
+      { id: '_mBXP7fWfFc', title: 'Sprint Drills: High Knees, A-Skips, B-Skips & More', why: 'Watch this first — these are your exact daily drills!' },
+      { id: 'cABeDhhqcXU', title: 'A-Series Speed Drill for Youth Athletes', why: 'Deep breakdown of A-skip mechanics for building top speed' },
+      { id: 'DTriPbhQDSM', title: '3 Must-Do Speed Drills for Youth Athletes', why: 'Quick 3-drill routine — great warm-up reference' },
+      { id: 't_J9xsTaQsg', title: '4 Speed Drills Every Youth Athlete Needs', why: 'Covers acceleration, deceleration, and change of direction' },
+    ]
+  },
+  {
+    icon: '💥', label: 'Plyos', color: '#ff6d00',
+    desc: 'Explosive jumping power for that first-step quickness in baseball, soccer, and tennis.',
+    videos: [
+      { id: '__CykmCDW_c', title: '6 Essential Plyo Exercises for Young Athletes', why: 'Your full plyo toolkit — broad jumps, bounds, and more' },
+      { id: 'HJi0bU2YiR8', title: 'Top 8 Beginner Plyo Jumps for Youth Athletes', why: 'Learn proper landing mechanics — super important to avoid injury' },
+      { id: '5hTI8ObJIb4', title: 'Broad Jumps — Form & Technique', why: 'Your Monday exercise — watch this before Week 1' },
+      { id: '91YV_-hEUvc', title: 'Lateral Broad Jumps Technique', why: 'Your Tuesday exercise — side-to-side bounding power' },
+    ]
+  },
+  {
+    icon: '🏋️', label: 'Strength', color: '#448aff',
+    desc: 'Build the engine. Proper form matters way more than how much weight you lift.',
+    videos: [
+      { id: 'uhghy9pFIPY', title: 'How To Do Perfect Romanian Deadlifts (RDLs)', why: 'Most important lift in your program — watch this before you touch a weight!' },
+      { id: '-dvlKCBDX_4', title: 'Goblet Squat & Deadlift for Functional Strength', why: 'Covers both your main lower body lifts in one video' },
+      { id: 'aNUSgyWRJYA', title: 'How To Do Pull-Ups for Complete Beginners', why: 'Step by step from zero to your first real pull-up' },
+      { id: 'bLFP7p22MJo', title: 'Push-Up Form for Kids & Beginners', why: 'Perfect push-up technique — form first, reps second' },
+    ]
+  },
+  {
+    icon: '🌀', label: 'Med Ball', color: '#b388ff',
+    desc: 'Rotational power = faster swings, kicks, and changes of direction. Huge for baseball and tennis.',
+    videos: [
+      { id: 'dgEIggs-yUE', title: '5 Best Rotational Med Ball Exercises for Power', why: 'Exactly what you do on Saturdays — watch before training' },
+      { id: 'c7fB-K8Ih54', title: 'How to Execute Rotational Med Ball Throws', why: 'Key tip: hips start the rotation, NOT your arms!' },
+      { id: 'YPQuvSJL2FM', title: 'Medicine Ball Rotational Throw — Technique Demo', why: 'Short clean demo to check your form before each set' },
+    ]
+  },
+  {
+    icon: '🧘', label: 'Yoga', color: '#ffd600',
+    desc: 'Recovery is where you actually get faster. Never skip Sunday — this is part of the program.',
+    videos: [
+      { id: 'ERUovXxRgyo', title: 'Hip Mobility Drills for Kids & Young Athletes', why: 'Made specifically for athletes your age — start here every Sunday' },
+      { id: 'oGXIGrSMfYU', title: '10-Minute Tight Hips Yoga', why: 'Perfect for your daily cool-down on regular training days' },
+      { id: 'd-Ur2Mm6bCs', title: '20-Min Deep Stretch: Hips, Quads & Hamstrings', why: 'Your full Sunday recovery session — do the whole thing' },
+    ]
+  },
+];
+
+function renderVideos() {
+  const cat = VIDEO_CATS[currentVideoCategory];
+
+  const tabsHtml = VIDEO_CATS.map((c, i) => {
+    const isActive = i === currentVideoCategory;
+    const style = isActive
+      ? `background:${c.color};border-color:${c.color};color:${c.color === '#ffd600' ? '#000' : '#fff'};`
+      : '';
+    return `<button class="vid-tab" style="${style}" onclick="switchVideoCategory(${i})">${c.icon} ${c.label}</button>`;
+  }).join('');
+
+  const videosHtml = cat.videos.map(v => `
+    <div class="vid-card">
+      <div class="vid-title">▶ ${v.title}</div>
+      <div class="vid-why">⚡ ${v.why}</div>
+      <a class="vid-thumb-wrap" href="https://www.youtube.com/watch?v=${v.id}" target="_blank">
+        <img
+          src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg"
+          alt="${v.title}"
+          loading="lazy"
+        />
+        <div class="vid-play-btn">▶</div>
+      </a>
+      <div class="vid-open-label">▶ Tap to open in YouTube</div>
+    </div>
+  `).join('');
+
+  document.getElementById('videos-content').innerHTML = `
+    <div class="vid-header-card">
+      <div class="vid-header-icon">${cat.icon}</div>
+      <div>
+        <div class="vid-header-title">${cat.label}</div>
+        <div class="vid-header-desc">${cat.desc}</div>
+      </div>
+    </div>
+    <div class="vid-tabs">${tabsHtml}</div>
+    ${videosHtml}
+  `;
+}
+
+function switchVideoCategory(idx) {
+  currentVideoCategory = idx;
+  renderVideos();
+}
+
+// ═══════════════════════════════════════════
+//  REWARDS VIEW (Gagan only)
+// ═══════════════════════════════════════════
+function renderRewards() {
+  if (currentUser !== 'gagan') return;
+  const times = getTimes('gagan');
+  const completed = getCompletedCount('gagan');
+  const pct = Math.round((completed / 42) * 100);
+
+  function calcImprovement(baseline, current) {
+    if (!baseline || !current) return null;
+    const pctChange = ((baseline - current) / baseline) * 100;
+    return pctChange.toFixed(1);
+  }
+
+  const imp100_3 = calcImprovement(times.baseline_100m, times.w3_100m);
+  const imp100_6 = calcImprovement(times.baseline_100m, times.w6_100m);
+  const imp800_3 = calcImprovement(times.baseline_800m, times.w3_800m);
+  const imp800_6 = calcImprovement(times.baseline_800m, times.w6_800m);
+
+  const bestImprovement = Math.max(
+    parseFloat(imp100_6) || 0,
+    parseFloat(imp800_6) || 0
+  );
+  const goalMet = bestImprovement >= 20;
+  const progressToGoal = Math.min(Math.round((bestImprovement / 20) * 100), 100);
+
+  function timeDisplay(val) {
+    if (!val) return '<span class="tc-time tbd">TBD</span>';
+    return `<div class="tc-time">${val}s</div>`;
+  }
+
+  function changeDisplay(val) {
+    if (!val) return '';
+    const n = parseFloat(val);
+    return `<div class="tc-change ${n > 0 ? 'positive' : ''}">${n > 0 ? '↓' : '↑'} ${Math.abs(n)}% ${n > 0 ? 'faster' : 'slower'}</div>`;
+  }
+
+  document.getElementById('rewards-content').innerHTML = `
+    <div class="rewards-hero">
+      <span class="ebike-emoji">${goalMet ? '🎉' : '🚴'}</span>
+      <div class="reward-title">${goalMet ? 'YOU EARNED IT!! 🎉' : 'The eBike Awaits...'}</div>
+      <div class="reward-sub">${goalMet
+        ? "Gagan, you hit your goal! You got 20% faster. Dad, time to order that bike! 🎊"
+        : "Get 20% faster in your 100m or 800m by the end of Week 6.\nComplete your baseline run tomorrow to start the clock!"
+      }</div>
+      ${!goalMet ? `
+        <div class="reward-locked">
+          🔒 Locked until 20% improvement is reached
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="goal-card">
+      <div class="card-title">📊 Overall Program Progress</div>
+      <div class="progress-bar" style="height:10px;">
+        <div class="progress-fill pf-green" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-label" style="margin-top:8px;"><span>${completed} / 42 workouts done</span><span>${pct}%</span></div>
+    </div>
+
+    ${bestImprovement > 0 ? `
+    <div class="goal-card">
+      <div class="card-title">🎯 Progress to eBike Goal (20% faster)</div>
+      <div class="progress-bar" style="height:14px;margin-top:8px;">
+        <div class="progress-fill pf-orange" style="width:${progressToGoal}%"></div>
+      </div>
+      <div class="progress-label" style="margin-top:8px;">
+        <span>Best improvement: ${bestImprovement.toFixed(1)}%</span>
+        <span>${progressToGoal}% of goal</span>
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="goal-card">
+      <div class="goal-event">⚡ 100m Dash Results</div>
+      <div class="time-comparison">
+        <div class="tc-box baseline">
+          <div class="tc-label">Baseline</div>
+          ${timeDisplay(times.baseline_100m)}
+        </div>
+        <div class="tc-box week3">
+          <div class="tc-label">Week 3</div>
+          ${timeDisplay(times.w3_100m)}
+          ${changeDisplay(imp100_3)}
+        </div>
+        <div class="tc-box week6">
+          <div class="tc-label">Week 6</div>
+          ${timeDisplay(times.w6_100m)}
+          ${changeDisplay(imp100_6)}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${!times.baseline_100m ? `<button class="enter-time-btn" onclick="openModal('gagan','100m','baseline')">📝 Enter Baseline Time</button>` : ''}
+        ${times.baseline_100m && !times.w3_100m ? `<button class="enter-time-btn" onclick="openModal('gagan','100m','w3')">📝 Enter Week 3 Time</button>` : ''}
+        ${times.baseline_100m && times.w3_100m && !times.w6_100m ? `<button class="enter-time-btn" onclick="openModal('gagan','100m','w6')">📝 Enter Week 6 Time</button>` : ''}
+      </div>
+    </div>
+
+    <div class="goal-card">
+      <div class="goal-event">🏃 800m Run Results</div>
+      <div class="time-comparison">
+        <div class="tc-box baseline">
+          <div class="tc-label">Baseline</div>
+          ${timeDisplay(times.baseline_800m)}
+        </div>
+        <div class="tc-box week3">
+          <div class="tc-label">Week 3</div>
+          ${timeDisplay(times.w3_800m)}
+          ${changeDisplay(imp800_3)}
+        </div>
+        <div class="tc-box week6">
+          <div class="tc-label">Week 6</div>
+          ${timeDisplay(times.w6_800m)}
+          ${changeDisplay(imp800_6)}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${!times.baseline_800m ? `<button class="enter-time-btn" onclick="openModal('gagan','800m','baseline')">📝 Enter Baseline Time</button>` : ''}
+        ${times.baseline_800m && !times.w3_800m ? `<button class="enter-time-btn" onclick="openModal('gagan','800m','w3')">📝 Enter Week 3 Time</button>` : ''}
+        ${times.baseline_800m && times.w3_800m && !times.w6_800m ? `<button class="enter-time-btn" onclick="openModal('gagan','800m','w6')">📝 Enter Week 6 Time</button>` : ''}
+      </div>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,#1a1200,#0d0d00);border-color:rgba(255,214,0,0.2);text-align:center;padding:24px;">
+      <div style="font-size:2.5rem;">🚴⚡🏆</div>
+      <div style="font-weight:900;font-size:1.1rem;margin-top:10px;">The Goal: 20% Faster</div>
+      <div style="color:var(--text2);font-size:0.82rem;margin-top:8px;line-height:1.6;">
+        Gagan, you run tomorrow's baseline. Then you train every single day for 6 weeks.
+        At Week 3 and Week 6 you retest. Hit 20% faster and the eBike is yours. 🔥
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+//  TIME ENTRY MODAL
+// ═══════════════════════════════════════════
+function openModal(user, event, checkpoint) {
+  modalContext = { user, event, checkpoint };
+  const labels = {
+    baseline: 'Baseline (today)',
+    w3: 'Week 3 Retest',
+    w6: 'Week 6 Final'
+  };
+  document.getElementById('modal-title').textContent = `Enter ${event} Time — ${labels[checkpoint]}`;
+  document.getElementById('modal-label').textContent = `Time in seconds (e.g. 14.5 for 100m, or 185 for 800m)`;
+  document.getElementById('modal-input').value = '';
+  document.getElementById('time-modal').classList.add('show');
+  setTimeout(() => document.getElementById('modal-input').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('time-modal').classList.remove('show');
+  modalContext = null;
+}
+
+function saveTime() {
+  if (!modalContext) return;
+  const val = document.getElementById('modal-input').value.trim();
+  if (!val) return;
+
+  // Parse time - accept seconds as number
+  const num = parseFloat(val.replace(',', '.'));
+  if (isNaN(num)) { showToast('Please enter a valid number'); return; }
+
+  const { user, event, checkpoint } = modalContext;
+  const times = getTimes(user);
+  const key = `${checkpoint}_${event.replace('m', '')}m`;
+
+  // Map to correct key
+  const keyMap = {
+    'baseline_100m': 'baseline_100m',
+    'w3_100m': 'w3_100m',
+    'w6_100m': 'w6_100m',
+    'baseline_800m': 'baseline_800m',
+    'w3_800m': 'w3_800m',
+    'w6_800m': 'w6_800m',
+  };
+  const actualKey = keyMap[key];
+  if (actualKey) times[actualKey] = num;
+  saveTimes(user, times);
+
+  closeModal();
+  showToast(`✅ ${event} time saved: ${num}s`);
+  renderRewards();
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Close modal on overlay click
+document.getElementById('time-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Enter key in modal
+document.getElementById('modal-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') saveTime();
+});
+</script>
+
+</body>
+</html>
