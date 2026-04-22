@@ -1,0 +1,10 @@
+name: gogiafitness
+static_sites:
+- name: gogiafitness
+  source_dir: Gagan's running webapp
+  index_document: index.html
+  error_document: index.html
+  github:
+    repo: jgogia-cali72/GogiaFitness
+    branch: main
+    deploy_on_push: true
