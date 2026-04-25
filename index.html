@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gogia Fitness 🏃</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1059,8 +1060,13 @@ const NUTRITION = {
 };
 
 // ═══════════════════════════════════════════
-//  STORAGE HELPERS
+//  SUPABASE + STORAGE HELPERS
 // ═══════════════════════════════════════════
+const _sb = supabase.createClient(
+  'https://lbyvrbhfxdynmuzzzqye.supabase.co',
+  'sb_publishable_XCZMcICYxwxdE1FbT7c4BA_HDQZMJr8'
+);
+
 function storageKey(user, key) { return `gogia_${user}_${key}`; }
 
 function getSavedData(user, key, def) {
@@ -1072,6 +1078,15 @@ function getSavedData(user, key, def) {
 
 function saveData(user, key, val) {
   try { localStorage.setItem(storageKey(user, key), JSON.stringify(val)); } catch(e) {}
+  _sb.from('user_data').upsert({ user_name: user, key, value: JSON.stringify(val) }).then(() => {});
+}
+
+async function loadUserDataFromSupabase(user) {
+  const { data, error } = await _sb.from('user_data').select('key, value').eq('user_name', user);
+  if (error || !data) return;
+  data.forEach(row => {
+    try { localStorage.setItem(storageKey(user, row.key), row.value); } catch(e) {}
+  });
 }
 
 function getDoneSet(user) {
@@ -1148,8 +1163,9 @@ const USERS = {
   arjun: { name: 'Arjun', avatar: '🔥', color: 'arjun', age: 10, sports: 'Baseball • Soccer' },
 };
 
-function login(user) {
+async function login(user) {
   currentUser = user;
+  await loadUserDataFromSupabase(user);
   const u = USERS[user];
   document.getElementById('login-page').style.display = 'none';
   document.getElementById('app').classList.add('visible');
