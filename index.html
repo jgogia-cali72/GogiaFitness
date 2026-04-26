@@ -1114,10 +1114,16 @@ function getStreak(user) {
 }
 
 function getTimes(user) {
-  return getSavedData(user, 'times', {
+  const times = getSavedData(user, 'times', {
     baseline_100m: null, w3_100m: null, w6_100m: null,
     baseline_800m: null, w3_800m: null, w6_800m: null,
   });
+  // One-time fix: 800m baseline was stored as raw "3" instead of 211.38 (3:31.38)
+  if (user === 'gagan' && times.baseline_800m !== null && times.baseline_800m < 10) {
+    times.baseline_800m = 211.38;
+    saveData(user, 'times', times);
+  }
+  return times;
 }
 
 function saveTimes(user, times) {
@@ -1707,7 +1713,13 @@ function renderRewards() {
 
   function timeDisplay(val) {
     if (!val) return '<span class="tc-time tbd">TBD</span>';
-    return `<div class="tc-time">${val}s</div>`;
+    const num = parseFloat(val);
+    if (num >= 60) {
+      const mins = Math.floor(num / 60);
+      const secs = (num % 60).toFixed(2).padStart(5, '0');
+      return `<div class="tc-time">${mins}:${secs}</div>`;
+    }
+    return `<div class="tc-time">${num.toFixed(2)}s</div>`;
   }
 
   function changeDisplay(val) {
@@ -1824,7 +1836,9 @@ function openModal(user, event, checkpoint) {
     w6: 'Week 6 Final'
   };
   document.getElementById('modal-title').textContent = `Enter ${event} Time — ${labels[checkpoint]}`;
-  document.getElementById('modal-label').textContent = `Time in seconds (e.g. 14.5 for 100m, or 185 for 800m)`;
+  document.getElementById('modal-label').textContent = event === '800m'
+    ? `Time as M:SS.XX (e.g. 3:31.38)`
+    : `Time in seconds (e.g. 17.13)`;
   document.getElementById('modal-input').value = '';
   document.getElementById('time-modal').classList.add('show');
   setTimeout(() => document.getElementById('modal-input').focus(), 100);
@@ -1840,29 +1854,33 @@ function saveTime() {
   const val = document.getElementById('modal-input').value.trim();
   if (!val) return;
 
-  // Parse time - accept seconds as number
-  const num = parseFloat(val.replace(',', '.'));
-  if (isNaN(num)) { showToast('Please enter a valid number'); return; }
-
   const { user, event, checkpoint } = modalContext;
+
+  // Parse time: accept M:SS.XX for 800m or decimal seconds for 100m
+  let num;
+  if (val.includes(':')) {
+    const [mPart, sPart] = val.split(':');
+    num = parseFloat(mPart) * 60 + parseFloat(sPart.replace(',', '.'));
+  } else {
+    num = parseFloat(val.replace(',', '.'));
+  }
+  if (isNaN(num) || num <= 0) { showToast('Please enter a valid time'); return; }
+
   const times = getTimes(user);
   const key = `${checkpoint}_${event.replace('m', '')}m`;
-
-  // Map to correct key
   const keyMap = {
-    'baseline_100m': 'baseline_100m',
-    'w3_100m': 'w3_100m',
-    'w6_100m': 'w6_100m',
-    'baseline_800m': 'baseline_800m',
-    'w3_800m': 'w3_800m',
-    'w6_800m': 'w6_800m',
+    'baseline_100m': 'baseline_100m', 'w3_100m': 'w3_100m', 'w6_100m': 'w6_100m',
+    'baseline_800m': 'baseline_800m', 'w3_800m': 'w3_800m', 'w6_800m': 'w6_800m',
   };
   const actualKey = keyMap[key];
   if (actualKey) times[actualKey] = num;
   saveTimes(user, times);
 
   closeModal();
-  showToast(`✅ ${event} time saved: ${num}s`);
+  const display = num >= 60
+    ? `${Math.floor(num/60)}:${(num%60).toFixed(2).padStart(5,'0')}`
+    : `${num.toFixed(2)}s`;
+  showToast(`✅ ${event} time saved: ${display}`);
   renderRewards();
 }
 
