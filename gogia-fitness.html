@@ -1118,11 +1118,26 @@ function saveExDone(user, week, dayOfWeek, data) {
 // ═══════════════════════════════════════════
 //  CURRENT DATE → WEEK + DAY
 // ═══════════════════════════════════════════
+function localDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function getProgramStartDate(user) {
+  // One-time migration: stored dates used toISOString() (UTC), which shifts the date
+  // ahead for users in negative-offset timezones (e.g. PST). Subtract 1 day to correct.
+  if (!getSavedData(user, 'start_date_v2', false)) {
+    const existing = getSavedData(user, 'start_date', null);
+    if (existing) {
+      const d = new Date(existing + 'T00:00:00');
+      d.setDate(d.getDate() - 1);
+      localStorage.setItem(storageKey(user, 'start_date'), JSON.stringify(localDateStr(d)));
+    }
+    saveData(user, 'start_date_v2', true);
+  }
+
   let stored = getSavedData(user, 'start_date', null);
   if (!stored) {
-    // default to today
-    stored = new Date().toISOString().slice(0, 10);
+    stored = localDateStr(new Date());
     saveData(user, 'start_date', stored);
   }
   return new Date(stored + 'T00:00:00');

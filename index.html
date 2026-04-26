@@ -1078,7 +1078,9 @@ function getSavedData(user, key, def) {
 
 function saveData(user, key, val) {
   try { localStorage.setItem(storageKey(user, key), JSON.stringify(val)); } catch(e) {}
-  _sb.from('user_data').upsert({ user_name: user, key, value: JSON.stringify(val) }).then(() => {});
+  _sb.from('user_data')
+    .upsert({ user_name: user, key, value: JSON.stringify(val) }, { onConflict: 'user_name,key' })
+    .then(({ error }) => { if (error) console.error('Supabase save error:', key, error); });
 }
 
 async function loadUserDataFromSupabase(user) {
@@ -1133,11 +1135,29 @@ function saveExDone(user, week, dayOfWeek, data) {
 // ═══════════════════════════════════════════
 //  CURRENT DATE → WEEK + DAY
 // ═══════════════════════════════════════════
+function localDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function getProgramStartDate(user) {
+  // One-time migration: stored dates used toISOString() (UTC), which shifts the date
+  // ahead for users in negative-offset timezones (e.g. PST). Subtract 1 day to correct.
+  if (!getSavedData(user, 'start_date_v2', false)) {
+    const existing = getSavedData(user, 'start_date', null);
+    if (existing) {
+      const d = new Date(existing + 'T00:00:00');
+      d.setDate(d.getDate() - 1);
+      localStorage.setItem(storageKey(user, 'start_date'), JSON.stringify(localDateStr(d)));
+      _sb.from('user_data')
+        .upsert({ user_name: user, key: 'start_date', value: JSON.stringify(localDateStr(d)) }, { onConflict: 'user_name,key' })
+        .then(({ error }) => { if (error) console.error('Supabase migration error:', error); });
+    }
+    saveData(user, 'start_date_v2', true);
+  }
+
   let stored = getSavedData(user, 'start_date', null);
   if (!stored) {
-    // default to today
-    stored = new Date().toISOString().slice(0, 10);
+    stored = localDateStr(new Date());
     saveData(user, 'start_date', stored);
   }
   return new Date(stored + 'T00:00:00');
